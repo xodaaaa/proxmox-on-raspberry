@@ -7,7 +7,7 @@ IP_ADDR=$(hostname -I | awk '{print $1}')
 sudo cp /etc/hosts /etc/hosts.bak
 
 # Replace the IP for raspberrypi
-sudo sed -i "s/^127\.0\.1\.1[[:space:]]\+raspberrypi\$/${IP_ADDR} raspberrypi/" /etc/hosts
+sudo sed -i "s/^127\.0\.1\.1[[:space:]]\+[[:alnum:]-]\+/${IP_ADDR} $(hostname)/" /etc/hosts
 
 echo "Updated /etc/hosts: raspberrypi now points to $IP_ADDR"
 
