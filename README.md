@@ -1,63 +1,64 @@
-# PXVIRT Proxmox fork installation process on Raspberry Pi <br />
-See script included to automatically run all pre-installation tasks. <br />
-Proxmox VE is not yet officially available for ARM architecture on Proxmox website. <br />
-There are many forks of that project that already work fine though. <br />
-The script and README is based on instructions for pxvirt fork: <br />
-https://docs.pxvirt.lierfang.com/en/installfromdebian.html <br />
-It can be used with Raspberry Pi 3B or newer (3B+, Raspberry 4, 5, 500 etc) <br /> <br />
-Although it will run on devices with just 1GB of RAM, it is advisable to get Raspberry with at least 4GB of RAM memory. <br />
-It works with Debian 12 Bookworm and Debian 13 Trixie. <br />
-Note - that if you first install Debian 12 on your Raspberry - you will get Proxmox 8, <br />
-but if you install Debian 13 - you will get Proxmox 9. <br /> <br />
+Proxmox on Raspberry Pi 4 - Preconfiguration Script
+Este proyecto contiene un script de preconfiguración para instalar Proxmox VE en una Raspberry Pi 4.
 
-## Raspberry Pi flashing process: <br />
-Download Raspberry Pi Imager from here: https://www.raspberrypi.com/software/ <br /> 
-Connect your Raspberry Pi to your network using WIRED connection! <br />
-(even though Pi has wireless module - it would be challenging to get it running with Proxmox). <br />
-Flash your MicroSD card or SSD drive choosing Debian 12 (Bookworm) or Debian 13 (Trixie) - I would suggest going for the latter. <br />
-Insert your MicroSD or SSD and start your Raspberry Pi. <br />
-Follow the on-screen process to complete Debian installation. <br /> <br />
+⚠️ Requisitos y Compatibilidad
+Dispositivo: Raspberry Pi 4
 
-## Raspberry Pi preparation process: <br />
-If you run your operating system on MicroSD, avoid using swapping as its not only slow <br />
-but will also kill your MicroSD card very fast. <br />
-You can run command `sudo swapoff -a`, check any entries for swap in `/etc/fstab` and reboot the system. <br />
-Proxmox requires a root password when you log on to it and by default Raspberry does not have password configured for root user. <br />
-You need to create one by running `sudo passwd root` and then type your password twice to get it configured. <br />
-Check your current interfaces with `ip address` command, see if you have valid ip address and on what interface. <br />
-Check current entries in `/etc/hosts` by running `cat /etc/hosts` command. <br />
+Sistema Operativo: Raspberry Pi OS Lite (64-bit)
 
-## Now run the pxvirt preparation script included <br />
-Simply git clone the script or even copy-paste from here and remember to `chmod +x` . <br />
-Run the script with sudo privileges - so `sudo ./pxvirtpreps.sh` <br />
-When the process is completed - reboot the Pi. <br />
-Check again network interfaces with `cat /etc/network/interfaces` <br />
-You should now see the vmbr0 linux bridge created and it should have ip assigned, sth like: <br />
-```bash
-auto eth0
-iface eth0 inet manual
+Versión específica: 2025-05-13
 
-auto vmbr0
-iface vmbr0 inet manual
-    address 192.168.1.59/24
-    gateway 192.168.1.1
-    bridge-ports eth0
-    bridge-stp off
-    bridge-fd 0
-```
-You can also run `cat /etc/apt/sources.list.d/pxvirt-sources.list` and you should see there this line: <br />
-`deb  https://mirrors.lierfang.com/pxcloud/pxvirt $VERSION_CODENAME main` <br />
-where the `$VERSION_CODENAME` will be replaced with bookworm or trixie depending on debian version you are running. <br />
-Check again hosts file by running `cat /etc/hosts` command and see if you have ip pointing to raspberrypi host <br />
+Fecha de validez de repositorios: 08/11/2025
 
-## PXVIRT installation process <br />
-Just run `apt update` and then: <br />
-`apt install proxmox-ve pve-manager qemu-server pve-cluster -y` as per instruction on pxvirt website. <br />
-This process might take over 10 minutes and you might see screen going off and on. <br />
-Once its completed - you should be able to access Proxmox from any device on your network by going to: <br />
-`https://<vmbr0_ip_address>:8006` <br />
+Descarga del Sistema Operativo
+Descarga la imagen oficial desde:
 
-## Mounting NAS location to Raspberry <br />
-Not related to the process above, but if you want to mount NAS to Raspberry, just <br />
-create folder like `mkdir -p /mnt/marek` and run that: <br />
-`mount -t cifs -o username=marek //192.168.1.225/Shared /mnt/marek/`
+text
+https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2025-05-13/2025-05-13-raspios-bookworm-arm64-lite.img.xz
+🛠️ Configuración Inicial
+Paso 1: Flashear la Imagen
+Usa el software oficial de Raspberry Pi Imager para flashear la imagen
+
+Durante el flasheo, configura los siguientes ajustes:
+
+Cambiar hostname
+
+Configurar ubicación y teclado
+
+Establecer usuario y contraseña
+
+Activar conexión SSH (usando contraseña)
+
+Paso 2: Primera Conexión y Preparación
+Conéctate a la Raspberry Pi via SSH con tus credenciales
+
+Ejecuta los siguientes comandos:
+
+bash
+sudo apt update
+sudo apt upgrade -y
+sudo apt install curl -y
+Paso 3: Configurar Usuario Root
+bash
+sudo passwd root
+Establece una contraseña para el usuario root (necesario para acceder a Proxmox posteriormente).
+
+Paso 4: Reiniciar
+bash
+sudo reboot
+Espera a que se reinicie y vuelve a conectarte via SSH.
+
+🚀 Ejecutar Script de Preconfiguración
+Ejecuta el siguiente comando para aplicar los preajustes:
+
+bash
+curl -fsSL https://raw.githubusercontent.com/xodaaaa/proxmox-on-raspberry/refs/heads/main/pxvirtpreps.sh | bash
+Paso 5: Reiniciar Después del Script
+bash
+sudo reboot
+📦 Instalación de Proxmox VE
+Después del reinicio, ejecuta:
+
+bash
+sudo apt update
+sudo apt install proxmox-ve pve-manager qemu-server pve-cluster -y
