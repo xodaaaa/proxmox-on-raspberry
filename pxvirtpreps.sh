@@ -15,7 +15,8 @@ echo "Updated /etc/hosts: raspberrypi now points to $IP_ADDR"
 curl -L https://mirrors.lierfang.com/pxcloud/lierfang.gpg -o /etc/apt/trusted.gpg.d/lierfang.gpg
 
 # Add the repository to the sources list
-echo "deb  https://mirrors.lierfang.com/pxcloud/pxvirt $VERSION_CODENAME main">/etc/apt/sources.list.d/pxvirt-sources.list
+source /etc/os-release
+bash -c 'source /etc/os-release && echo "deb [arch=arm64] https://mirrors.lierfang.com/pxcloud/pxvirt $VERSION_CODENAME main" > /etc/apt/sources.list.d/pxvirt-sources.list'
 
 # Disable NetworkManager
 systemctl disable NetworkManager
